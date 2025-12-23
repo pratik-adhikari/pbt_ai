@@ -69,3 +69,7 @@ data/
 /batch_transcribe_whispercpp.py
 /transcribe_url.sh
 urls.txt
+
+# Old/legacy files
+/Dockerfile
+SETUP_GITHUB.md

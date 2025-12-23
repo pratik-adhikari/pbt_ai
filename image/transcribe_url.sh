@@ -17,6 +17,8 @@ OUTDIR="${OUTDIR:-/out}"
 LANG="${LANG:-auto}"
 THREADS="${THREADS:-8}"
 NGL="${NGL:-999}"
+DEVANAGARI="${DEVANAGARI:-0}"
+MERGE_CAPTIONS="${MERGE_CAPTIONS:-0}"
 
 # Working directories
 WORKDIR="/tmp/work"
@@ -146,6 +148,27 @@ echo "✓ Saved metadata: metadata.json"
 
 # Delete WAV file (we don't need it anymore)
 rm -f "$WAV"
+
+# Run post-processing if requested
+if [[ "$DEVANAGARI" == "1" ]] || [[ "$MERGE_CAPTIONS" == "1" ]]; then
+  echo ""
+  echo "Running post-processing..."
+  
+  POSTPROCESS_ARGS=("$OUTDIR")
+  
+  if [[ "$DEVANAGARI" == "1" ]]; then
+    POSTPROCESS_ARGS+=(--devanagari)
+    echo "  - Devanagari transliteration enabled"
+  fi
+  
+  if [[ "$MERGE_CAPTIONS" == "1" ]]; then
+    POSTPROCESS_ARGS+=(--merge-captions)
+    echo "  - Caption merging enabled"
+  fi
+  
+  python3 /usr/local/bin/postprocess.py "${POSTPROCESS_ARGS[@]}"
+  echo "✓ Post-processing complete"
+fi
 
 # Show final output files
 echo ""

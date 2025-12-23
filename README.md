@@ -45,14 +45,15 @@ Output will be in `./out/YYYY-MM-DD__video-title__VIDEO_ID/`
 - yt-dlp with deno runtime
 - whisper.cpp with CUDA
 - ffmpeg
+- indic-transliteration (for Devanagari)
 - All other dependencies
 
 ### Setup
 
 ```bash
 # Clone repository
-git clone <repo-url>
-cd whisper_docker
+git clone https://github.com/pratik-adhikari/whisper_ai.git
+cd whisper_ai
 
 # Make wrapper script executable
 chmod +x ytx.sh
@@ -60,9 +61,7 @@ chmod +x ytx.sh
 # Build Docker image (first time only, ~5-10 minutes)
 docker build -f Dockerfile.whispercpp -t whispercpp:cuda12 .
 
-# OPTIONAL: Install Python package for post-processing features
-# (only needed if you want --devanagari or --merge-captions)
-pip install -e .
+# That's it! No pip install needed on host.
 ```
 
 ## Usage

@@ -55,6 +55,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install yt-dlp with default extractors
 RUN python3 -m pip install --no-cache-dir -U pip "yt-dlp[default]"
 
+# Install indic-transliteration for Devanagari support
+RUN python3 -m pip install --no-cache-dir "indic-transliteration>=2.3.0"
+
 # Install deno for yt-dlp JavaScript execution (handles some video sites)
 RUN curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh
 
@@ -67,9 +70,10 @@ COPY --from=build /opt/whisper_runtime/models /opt/whisper_models_scripts
 RUN ldconfig
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
-# Copy container script
+# Copy container scripts
 COPY image/transcribe_url.sh /usr/local/bin/transcribe_url.sh
-RUN chmod +x /usr/local/bin/transcribe_url.sh
+COPY scripts/postprocess.py /usr/local/bin/postprocess.py
+RUN chmod +x /usr/local/bin/transcribe_url.sh /usr/local/bin/postprocess.py
 
 # Explicit bash entrypoint to avoid shell parsing errors
 ENTRYPOINT ["/bin/bash", "/usr/local/bin/transcribe_url.sh"]

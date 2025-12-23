@@ -92,6 +92,8 @@ def run_container(
     model_path: Path,
     lang: str = "auto",
     threads: int = 8,
+    devanagari: bool = False,
+    merge_captions: bool = False,
     verbose: bool = False
 ) -> None:
     """Run transcription in Docker container.
@@ -103,6 +105,8 @@ def run_container(
         model_path: Path to model file on host
         lang: Language code (or 'auto')
         threads: Number of threads for whisper-cli
+        devanagari: Enable Devanagari transliteration
+        merge_captions: Enable caption merging
         verbose: If True, show container output
         
     Raises:
@@ -120,9 +124,18 @@ def run_container(
         "-e", f"MODEL=/model",
         "-e", f"LANG={lang}",
         "-e", f"THREADS={threads}",
+    ]
+    
+    # Add post-processing flags
+    if devanagari:
+        cmd.extend(["-e", "DEVANAGARI=1"])
+    if merge_captions:
+        cmd.extend(["-e", "MERGE_CAPTIONS=1"])
+    
+    cmd.extend([
         image_name,
         url
-    ]
+    ])
     
     print(f"Running transcription in Docker container...")
     

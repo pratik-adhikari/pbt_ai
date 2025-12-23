@@ -222,7 +222,7 @@ Examples:
     temp_output_dir = args.out_root / temp_folder_name
     temp_output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Run transcription in Docker (container does everything: metadata, download, transcribe)
+    # Run transcription in Docker (container does everything: metadata, download, transcribe, post-process)
     print(f"Starting transcription...")
     try:
         run_container(
@@ -232,6 +232,8 @@ Examples:
             model_path=model_path,
             lang=args.lang,
             threads=args.threads,
+            devanagari=args.devanagari,
+            merge_captions=args.merge_captions,
             verbose=args.verbose
         )
     except subprocess.CalledProcessError:
@@ -286,25 +288,6 @@ Examples:
         lang=args.lang,
         gpu_used=True
     )
-    
-    # Run post-processing if requested (requires indic-transliteration on host)
-    if args.devanagari or args.merge_captions:
-        print(f"\nRunning post-processing...")
-        postprocess_script = Path(__file__).parent.parent / "scripts" / "postprocess.py"
-        
-        if not postprocess_script.exists():
-            print(f"WARNING: postprocess.py not found, skipping", file=sys.stderr)
-        else:
-            cmd = [sys.executable, str(postprocess_script), str(final_output_dir)]
-            if args.devanagari:
-                cmd.append("--devanagari")
-            if args.merge_captions:
-                cmd.append("--merge-captions")
-            
-            try:
-                subprocess.run(cmd, check=True)
-            except subprocess.CalledProcessError:
-                print("WARNING: Post-processing failed", file=sys.stderr)
     
     print(f"\n✅ Transcription complete!")
     print(f"   Output: {final_output_dir}")
